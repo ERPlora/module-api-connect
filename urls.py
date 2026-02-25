@@ -7,6 +7,10 @@ urlpatterns = [
     # Dashboard
     path('', views.dashboard, name='dashboard'),
 
+    # Navigation tab aliases
+    path('keys/', views.api_keys_list, name='keys'),
+
+
     # APIKey
     path('api_keys/', views.api_keys_list, name='api_keys_list'),
     path('api_keys/add/', views.api_key_add, name='api_key_add'),
