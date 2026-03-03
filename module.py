@@ -33,3 +33,19 @@ PERMISSIONS = [
 'api_connect.delete_webhook',
 'api_connect.manage_settings',
 ]
+
+ROLE_PERMISSIONS = {
+    "admin": ["*"],
+    "manager": [
+        "add_apikey",
+        "add_webhook",
+        "change_webhook",
+        "view_apikey",
+        "view_webhook",
+    ],
+    "employee": [
+        "add_apikey",
+        "view_apikey",
+        "view_webhook",
+    ],
+}
