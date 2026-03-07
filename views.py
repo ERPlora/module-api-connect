@@ -3,6 +3,8 @@ API & Webhooks Module Views
 """
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
+from django.http import HttpResponse
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, render as django_render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -114,6 +116,7 @@ def api_keys_list(request):
     }
 
 @login_required
+@htmx_view('api_connect/pages/api_key_add.html', 'api_connect/partials/api_key_add_content.html')
 def api_key_add(request):
     hub_id = request.session.get('hub_id')
     if request.method == 'POST':
@@ -131,10 +134,13 @@ def api_key_add(request):
         obj.expires_at = expires_at
         obj.last_used_at = last_used_at
         obj.save()
-        return _render_api_keys_list(request, hub_id)
-    return django_render(request, 'api_connect/partials/panel_api_key_add.html', {})
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse('api_connect:api_keys_list')
+        return response
+    return {}
 
 @login_required
+@htmx_view('api_connect/pages/api_key_edit.html', 'api_connect/partials/api_key_edit_content.html')
 def api_key_edit(request, pk):
     hub_id = request.session.get('hub_id')
     obj = get_object_or_404(APIKey, pk=pk, hub_id=hub_id, is_deleted=False)
@@ -147,7 +153,7 @@ def api_key_edit(request, pk):
         obj.last_used_at = request.POST.get('last_used_at') or None
         obj.save()
         return _render_api_keys_list(request, hub_id)
-    return django_render(request, 'api_connect/partials/panel_api_key_edit.html', {'obj': obj})
+    return {'obj': obj}
 
 @login_required
 @require_POST
@@ -264,6 +270,7 @@ def webhooks_list(request):
     }
 
 @login_required
+@htmx_view('api_connect/pages/webhook_add.html', 'api_connect/partials/webhook_add_content.html')
 def webhook_add(request):
     hub_id = request.session.get('hub_id')
     if request.method == 'POST':
@@ -283,10 +290,13 @@ def webhook_add(request):
         obj.last_triggered_at = last_triggered_at
         obj.failure_count = failure_count
         obj.save()
-        return _render_webhooks_list(request, hub_id)
-    return django_render(request, 'api_connect/partials/panel_webhook_add.html', {})
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse('api_connect:webhooks_list')
+        return response
+    return {}
 
 @login_required
+@htmx_view('api_connect/pages/webhook_edit.html', 'api_connect/partials/webhook_edit_content.html')
 def webhook_edit(request, pk):
     hub_id = request.session.get('hub_id')
     obj = get_object_or_404(Webhook, pk=pk, hub_id=hub_id, is_deleted=False)
@@ -300,7 +310,7 @@ def webhook_edit(request, pk):
         obj.failure_count = int(request.POST.get('failure_count', 0) or 0)
         obj.save()
         return _render_webhooks_list(request, hub_id)
-    return django_render(request, 'api_connect/partials/panel_webhook_edit.html', {'obj': obj})
+    return {'obj': obj}
 
 @login_required
 @require_POST
